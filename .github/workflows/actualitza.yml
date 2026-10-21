@@ -23,9 +23,9 @@ jobs:
   actualitza:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -33,10 +33,12 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Baixa l'UCDP
+        id: ucdp
         run: python scripts/fetch_ucdp.py
         continue-on-error: true   # si falla, es manté el darrer build/ucdp.json
 
       - name: Baixa l'HDX HAPI
+        id: hapi
         run: python scripts/fetch_hapi.py
         continue-on-error: true   # si falla, es manté el darrer build/hapi.json
 
@@ -59,4 +61,10 @@ jobs:
           fi
 
       - name: Mostra l'informe
-        run: cat informe/darrer_informe.md >> "$GITHUB_STEP_SUMMARY"
+        if: always()
+        run: |
+          {
+            if [ "${{ steps.ucdp.outcome }}" != "success" ]; then echo "> ⚠️ **No s'ha pogut baixar l'UCDP.** Es mantenen les dades anteriors."; echo; fi
+            if [ "${{ steps.hapi.outcome }}" != "success" ]; then echo "> ⚠️ **No s'ha pogut baixar l'HDX HAPI.** Es mantenen les dades anteriors."; echo; fi
+            cat informe/darrer_informe.md
+          } >> "$GITHUB_STEP_SUMMARY"
