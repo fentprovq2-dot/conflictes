@@ -260,7 +260,7 @@ let F={cat:"all",type:"all",st:"act",region:"",q:""}, sortK="dc", sortDir=-1, se
 
 // ---------- capçalera i xifres
 (function(){
-  const h=D.hapi_meta||{};
+  const h=M;
   document.getElementById("asof").textContent=`Dades: UCDP ${VER} i Candidate ${PERS} · ACLED fins a la setmana del ${h.acled_to||"–"}`;
   document.getElementById("phase-note").textContent=`Les xifres del ${Y1} són provisionals (UCDP Candidate) i poden canviar quan l'UCDP publiqui la versió anual. Darrera actualització: ${h.generated||""}.`;
   const act=CONF.filter(c=>c.status!=="latent");
@@ -430,7 +430,7 @@ function cardA(c){
   <div class="sec"><h3>Fonts</h3>${chips([["Fitxa UCDP",UCDPURL(c)],["UCDP Candidate","https://ucdp.uu.se/downloads/#candidate"],["RULAC","https://rulac.org/browse/conflicts"],["CrisisWatch","https://www.crisisgroup.org/crisiswatch"]])}</div>`;
 }
 function cardB(b){
-  const wk=b.wk||[], W=(D.hapi_meta||{}).weeks||[];
+  const wk=b.wk||[], W=M.weeks||[];
   const lab=W.map((d,i)=>i%13===4?d.slice(5,7)+"/"+d.slice(2,4):"");
   return `<div><div class="badges"><span class="badge b">Categoria B · Altres violències</span></div>
     <h2>${esc(b.title)}</h2><div class="where">Fitxa ${esc(b.key)} · cap conflicte de l'UCDP actiu al país el ${Y0} ni el ${Y1}</div></div>
@@ -456,7 +456,7 @@ function select(key,fromMap,init){
 
 // ---------- metodologia
 (function(){
-  const m=D.meta||{}, h=D.hapi_meta||{};
+  const h=M;
   document.getElementById("method").innerHTML=`
   <div><h3>Categoria A · Criteris UCDP</h3><p>Hi entra tot conflicte que l'UCDP registra amb almenys 25 morts en un any: el ${Y0} segons les bases anuals ${VER}, o el ${Y1} (${PER}) segons l'UCDP Candidate. Inclou els tres tipus de l'UCDP: conflictes estatals (amb un govern com a part), conflictes entre grups no estatals i violència unilateral contra civils. Els conflictes actius el ${Y0} que no arriben a 25 morts el ${Y1} es mostren buits al mapa.</p></div>
   <div><h3>Categoria B · Altres violències</h3><p>Països on ACLED compta almenys ${h.b_threshold||100} morts per violència política en les darreres 52 setmanes i on l'UCDP no hi registra cap conflicte de categoria A. La fitxa recull les dades d'ACLED, la violència que l'UCDP hi registra per sota del llindar i el context humanitari.</p></div>
@@ -466,7 +466,7 @@ function select(key,fromMap,init){
     <li>${num(D.xxx.deaths)} morts del ${Y1} corresponen a esdeveniments sense actor identificat (${D.xxx.n} grups provisionals de l'UCDP) i no s'atribueixen a cap conflicte; compten en el total general.</li>
     <li>Les xifres de l'UCDP i d'ACLED no se sumen ni es comparen directament: tenen definicions diferents.</li></ul></div>
   <div><h3>Fonts i versions</h3><ul>
-    <li><a href="https://ucdp.uu.se/downloads/" target="_blank" rel="noopener">UCDP</a>: ${esc(Object.values(m).join(", "))}.</li>
+    <li><a href="https://ucdp.uu.se/downloads/" target="_blank" rel="noopener">UCDP</a>: ${esc(Object.values(M.ucdp_files||{}).join(", "))}.</li>
     <li><a href="https://acleddata.com/conflict-data/download-data-files" target="_blank" rel="noopener">ACLED</a>: fitxers regionals agregats per setmana i regió administrativa, del ${esc(h.acled_from||"")} a la setmana del ${esc(h.acled_to||"")}. Només combats, explosions i violència contra civils. Les zones marítimes no es mostren al mapa.</li>
     <li><a href="https://data.humdata.org/organization/hdx-hapi" target="_blank" rel="noopener">HDX HAPI (OCHA)</a>: desplaçats interns i refugiats d'ACNUR (${esc(h.ref_year||"–")}).</li>
     <li>Dades descarregades el ${esc(h.generated||"")}.</li></ul></div>`;
