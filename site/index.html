@@ -1,0 +1,479 @@
+<title>Atles de conflictes armats</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: capçalera de publicació → xifres → mapa ample amb fitxa lateral → índex filtrable → metodologia */
+:root{
+  --bg:#f2ecdf; --paper:#fbf8f1; --ink:#2a211d; --muted:#6c6158; --line:#ddd2c1;
+  --garnet:#8a1f2c; --garnet-soft:#ecd3d2; --petrol:#1f5a63; --petrol-soft:#d2e2e3;
+  --land:#e6ddcc; --ocean:#f7f3ea; --warn:#a4661a; --good:#3f7a4a; --gray:#9b9087;
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#181513; --paper:#221e1b; --ink:#ede5d7; --muted:#a69a8d; --line:#3a332d;
+  --garnet:#d86f79; --garnet-soft:#4a2529; --petrol:#6fb1ba; --petrol-soft:#1f3b3f;
+  --land:#2e2925; --ocean:#1d1a17; --warn:#d9a04f; --good:#7cbf87; --gray:#7d736a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#181513; --paper:#221e1b; --ink:#ede5d7; --muted:#a69a8d; --line:#3a332d;
+  --garnet:#d86f79; --garnet-soft:#4a2529; --petrol:#6fb1ba; --petrol-soft:#1f3b3f;
+  --land:#2e2925; --ocean:#1d1a17; --warn:#d9a04f; --good:#7cbf87; --gray:#7d736a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1320px;margin:0 auto;display:grid;gap:22px}
+.mast{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.brand span{color:var(--garnet)}
+.meta{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(1.9rem,4.2vw,3rem);line-height:1.08;margin:0;text-wrap:balance;max-width:22ch}
+.lede{max-width:72ch;color:var(--muted);margin:8px 0 0}
+.note{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:.84rem;max-width:960px}
+.note b{color:var(--petrol);font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;padding-top:2px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px 28px}
+.stat .n{font-family:var(--f-display);font-size:2rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.78rem;color:var(--muted);max-width:24ch}
+.stat.a .n{color:var(--garnet)} .stat.b .n{color:var(--petrol)}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:500 .8rem var(--f-body);background:transparent;color:var(--muted);border:0;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+button:focus-visible,.row:focus-visible,.chip:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--petrol);outline-offset:2px}
+select,input[type=search]{font:500 .82rem var(--f-body);padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.ctl-label{font:600 .68rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+
+.main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:960px){.main{grid-template-columns:1fr}}
+.mapbox{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.76rem;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend i.hollow{background:transparent!important;border:1.5px solid var(--garnet)}
+.legend i.sq{border-radius:2px;transform:rotate(45deg)}
+svg#map{width:100%;height:auto;display:block;touch-action:manipulation}
+.country{fill:var(--land);stroke:var(--paper);stroke-width:.8}
+.country.ca{fill:var(--garnet-soft)} .country.cb{fill:var(--petrol-soft)}
+.sphere{fill:var(--ocean)} .grat{fill:none;stroke:var(--line);stroke-width:.4}
+.mk{cursor:pointer;stroke:var(--paper);stroke-width:1}
+.mk.a{fill:var(--garnet);fill-opacity:.78}
+.mk.a.latent{fill:transparent;stroke:var(--garnet);stroke-width:1.3;stroke-opacity:.8}
+.mk.b{fill:var(--petrol);fill-opacity:.85}
+.hot{fill:var(--warn);fill-opacity:.28;stroke:none;pointer-events:none}
+.country,.grat,.mk{vector-effect:non-scaling-stroke}
+.mapwrap{position:relative}
+.zoombar{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:4px}
+.zoombar button,.zones button{font:600 .9rem var(--f-body);background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.zoombar button{width:32px;height:32px;display:grid;place-items:center;padding:0}
+.zoombar button:hover,.zones button:hover{border-color:var(--petrol);color:var(--petrol)}
+.zones{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.zones button{font:500 .76rem var(--f-body);padding:4px 10px;border-radius:999px}
+.zones button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+svg#map{cursor:grab} svg#map:active{cursor:grabbing}
+.legend i.hot-l{background:var(--warn);opacity:.45}
+.layer{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted);cursor:pointer}
+.layer input{accent-color:var(--warn)}
+.mk.sel{stroke:var(--ink);stroke-width:2.4;stroke-opacity:1}
+.mk:focus-visible{outline:none;stroke:var(--ink);stroke-width:3}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--paper);font-size:.78rem;padding:5px 9px;border-radius:4px;opacity:0;transition:opacity .12s;z-index:5;max-width:260px}
+.mapnote{font-family:var(--f-mono);font-size:.68rem;color:var(--muted);margin-top:6px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px 20px;display:grid;gap:14px;min-width:0}
+@media (min-width:961px){.card{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px);overflow:auto}}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{display:inline-flex;align-items:center;gap:6px;font:500 .68rem var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.badge.a{background:var(--garnet-soft);color:var(--garnet)} .badge.b{background:var(--petrol-soft);color:var(--petrol)}
+.badge.st{border:1px solid var(--line);color:var(--muted)}
+.badge.st.nou{border-color:var(--warn);color:var(--warn)}
+.card h2{font-family:var(--f-display);font-weight:600;font-size:1.5rem;line-height:1.15;margin:8px 0 2px;text-wrap:balance}
+.card .where{font-size:.84rem;color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:.86rem;margin:0}
+.kv dt{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;padding-top:2px}
+.kv dd{margin:0;min-width:0}
+.sec h3{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.sec p{margin:0;font-size:.88rem}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.side{font-size:.84rem;min-width:0}
+.side b{display:block;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.side ul{margin:0;padding-left:16px}
+.side .sup{font-size:.78rem;color:var(--muted);margin-top:4px}
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fig{border-left:2px solid var(--line);padding-left:10px}
+.fig .v{font-family:var(--f-display);font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.fig .s{font-size:.72rem;color:var(--muted)}
+.chart text{font-family:var(--f-mono);font-size:9px;fill:var(--muted)}
+.srcs{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 .72rem var(--f-mono);border:1px solid var(--line);border-radius:4px;padding:2px 7px;color:var(--ink);text-decoration:none}
+.chip:hover{border-color:var(--petrol);color:var(--petrol)}
+.ed p{margin:0 0 8px;font-size:.9rem} .ed a{color:var(--petrol)}
+.level{font-family:var(--f-mono);font-size:.68rem;color:var(--muted)}
+.pending{border:1px dashed var(--line);border-radius:6px;padding:10px 12px;font-size:.82rem;color:var(--muted)}
+.why{background:var(--bg);border-radius:6px;padding:10px 12px;font-size:.84rem}
+.why b{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:var(--petrol);display:block;margin-bottom:3px}
+.mini{list-style:none;margin:0;padding:0;font-size:.82rem;display:grid;gap:3px}
+.mini li{display:flex;justify-content:space-between;gap:10px}
+.mini li span:last-child{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+
+.idx{display:grid;gap:10px}
+.idxbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.idx h2{font-family:var(--f-display);font-weight:600;font-size:1.35rem;margin:0}
+.count{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.tablewrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:8px;max-height:640px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:820px}
+th{position:sticky;top:0;background:var(--paper);text-align:left;font:600 .68rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);z-index:1}
+th button{all:unset;cursor:pointer} th button:focus-visible{outline:2px solid var(--petrol)}
+td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.row{cursor:pointer}
+.row:hover td,.row.sel td{background:var(--bg)}
+td.num,th.num{text-align:right}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:.78rem}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
+.dot.a{background:var(--garnet)} .dot.a.latent{background:transparent;border:1.5px solid var(--garnet)} .dot.b{background:var(--petrol);border-radius:1px;transform:rotate(45deg)}
+.tsub{display:block;font-size:.72rem;color:var(--muted)}
+.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;border-top:1px solid var(--line);padding-top:18px}
+.method h3{font-family:var(--f-display);font-size:1.05rem;font-weight:600;margin:0 0 4px}
+.method p,.method li{margin:0;font-size:.84rem;color:var(--muted);max-width:62ch}
+.method ul{margin:4px 0 0;padding-left:18px}
+.method a{color:var(--petrol)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="brand">Estat del <span>Món</span> · Observatori de conflictes</div>
+    <div class="meta" id="asof"></div>
+  </header>
+
+  <section>
+    <h1>Atles de conflictes armats del món</h1>
+    <p class="lede">Tots els conflictes armats registrats per l'UCDP (Universitat d'Uppsala) el <span class="y0"></span> i el <span class="y1"></span>, amb una fitxa per a cadascun, i les altres situacions de violència política que ACLED documenta fora d'aquests conflictes.</p>
+  </section>
+
+  <div class="note"><b>Dades</b><span id="phase-note"></span></div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls" role="group" aria-label="Filtres">
+    <span><span class="ctl-label">Categoria</span><span class="seg" id="seg-cat">
+      <button type="button" data-v="all" aria-pressed="true">Totes</button>
+      <button type="button" data-v="A" aria-pressed="false">A · UCDP</button>
+      <button type="button" data-v="B" aria-pressed="false">B · Altres</button></span></span>
+    <span><span class="ctl-label">Tipus</span><span class="seg" id="seg-type">
+      <button type="button" data-v="all" aria-pressed="true">Tots</button>
+      <button type="button" data-v="1" aria-pressed="false">Estatal</button>
+      <button type="button" data-v="2" aria-pressed="false">No estatal</button>
+      <button type="button" data-v="3" aria-pressed="false">Contra civils</button></span></span>
+    <span><span class="ctl-label">Activitat</span><span class="seg" id="seg-st">
+      <button type="button" data-v="all" aria-pressed="false">Tota</button>
+      <button type="button" data-v="act" aria-pressed="true">Activa el <span class="y1"></span></button></span></span>
+    <label class="layer" for="hotsw"><input type="checkbox" id="hotsw" checked>Focus de violència ACLED (12 setmanes)</label>
+    <select id="region" aria-label="Filtra per regió"><option value="">Totes les regions</option></select>
+  </div>
+
+  <div class="main">
+    <div class="mapbox">
+      <div class="legend">
+        <span><i style="background:var(--garnet)"></i>A · actiu el <span class="y1"></span> (≥25 morts)</span>
+        <span><i class="hollow"></i>A · actiu el <span class="y0"></span>, sota el llindar el <span class="y1"></span></span>
+        <span><i class="sq" style="background:var(--petrol)"></i>B · altra violència (ACLED)</span>
+        <span><i class="hot-l"></i>Focus ACLED: morts per regió en 12 setmanes</span>
+        <span>Mida: morts <span class="per"></span></span>
+      </div>
+      <div class="zones" id="zones" role="group" aria-label="Apropa el mapa a una regió">
+        <button type="button" data-z="world" aria-pressed="true">Món</button>
+        <button type="button" data-z="africa" aria-pressed="false">Àfrica</button>
+        <button type="button" data-z="sahel" aria-pressed="false">Sahel i llac Txad</button>
+        <button type="button" data-z="grans" aria-pressed="false">Banya d'Àfrica i Grans Llacs</button>
+        <button type="button" data-z="mideast" aria-pressed="false">Orient Mitjà</button>
+        <button type="button" data-z="europe" aria-pressed="false">Europa</button>
+        <button type="button" data-z="asia" aria-pressed="false">Àsia</button>
+        <button type="button" data-z="america" aria-pressed="false">Amèrica Llatina</button>
+      </div>
+      <div class="mapwrap">
+        <svg id="map" viewBox="0 0 960 490" role="img" aria-label="Mapa del món amb els conflictes armats"></svg>
+        <div class="zoombar"><button type="button" id="zin" aria-label="Apropa">+</button><button type="button" id="zout" aria-label="Allunya">−</button><button type="button" id="zreset" aria-label="Torna a la vista del món">⟲</button></div>
+      </div>
+      <div class="mapnote">Cada punt és un conflicte de l'UCDP, situat al centre geogràfic dels seus esdeveniments del <span class="y1"></span>. Les taques taronja són les regions on ACLED registra violència política en les 12 darreres setmanes. Per apropar-vos, feu servir els botons, les dreceres de regió, el doble clic, la roda del ratolí o el pessic al mòbil; arrossegueu per desplaçar el mapa. Feu clic en un punt o en una fila de l'índex per obrir-ne la fitxa.</div>
+    </div>
+    <aside class="card" id="card" aria-live="polite"></aside>
+  </div>
+
+  <section class="idx">
+    <div class="idxbar">
+      <div><h2>Índex de conflictes</h2><span class="count" id="count"></span></div>
+      <input type="search" id="q" placeholder="Cerca un país o un actor" aria-label="Cerca">
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th><button type="button" data-k="title">Conflicte</button></th>
+          <th>Tipus</th><th>Regió</th>
+          <th><button type="button" data-k="fy">Des de</button></th>
+          <th class="num"><button type="button" data-k="dp">Morts <span class="y0"></span></button></th>
+          <th class="num"><button type="button" data-k="dc">Morts <span class="y1"></span> ▾</button></th>
+          <th class="num"><button type="button" data-k="ev">Esdev. <span class="y1"></span></button></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="method" id="method"></section>
+</div>
+<div class="tip" id="tip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+(async function(){
+let D, WORLD;
+try {
+  [D, WORLD] = await Promise.all([fetch("data/atles_data.json").then(r=>r.json()), fetch("data/world-50m.json").then(r=>r.json())]);
+} catch(e) {
+  document.getElementById("card").innerHTML='<div class="pending">No s\'han pogut carregar les dades del mapa. Torneu-ho a provar més tard.</div>'; return;
+}
+const CONF=D.conflicts, CTX=D.ctx||{}, BSIT=D.b||[], M=D.meta||{};
+const Y0=M.y0, Y1=M.y1, MESN=["gen","feb","març","abr","maig","juny","jul","ag","set","oct","nov","des"];
+const PER=(M.m1>1?"gener–"+M.m1_name:"gener")+" "+Y1, PERS=(M.m1>1?"gen–"+MESN[M.m1-1]:"gen")+" "+Y1;
+const VER=((M.ucdp_files||{}).acd||"").replace(/.*acd-(\d\d)(\d+).*/,"$1.$2");
+document.querySelectorAll(".y0").forEach(e=>e.textContent=Y0);
+document.querySelectorAll(".y1").forEach(e=>e.textContent=Y1);
+document.querySelectorAll(".per").forEach(e=>e.textContent=PER);
+const TYPE={1:"Conflicte estatal",2:"Conflicte no estatal",3:"Violència contra civils"};
+const TYPESHORT={1:"Estatal",2:"No estatal",3:"Contra civils"};
+const ST={actiu:`Actiu el ${Y0} i el ${Y1}`,nou:`Nou o reactivat el ${Y1} (provisional)`,latent:`Actiu el ${Y0} · sota el llindar el ${Y1}`};
+const MES=["G","F","M","A","M","J","J","A","S","O","N","D"];
+const num=n=>n==null?"–":Math.round(n).toLocaleString("ca");
+const fmt=n=>n==null?"–":n>=1e6?(n/1e6).toLocaleString("ca",{maximumFractionDigits:1})+" M":n>=1e4?Math.round(n/1e3).toLocaleString("ca")+" mil":Math.round(n).toLocaleString("ca");
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const d26=c=>c.dc?c.dc[1]:0, d25=c=>c.dp?c.dp[1]:0;
+const UCDPURL=c=>"https://ucdp.uu.se/"+({1:"conflict",2:"nonstate",3:"onesided"}[c.t])+"/"+c.id;
+
+// unificar A i B en una sola llista d'elements
+CONF.forEach(c=>{c.cat="A"});
+BSIT.forEach(b=>{b.cat="B";b.t=0;b.status="b"});
+const ALL=[...CONF,...BSIT];
+let F={cat:"all",type:"all",st:"act",region:"",q:""}, sortK="dc", sortDir=-1, selKey=null;
+
+// ---------- capçalera i xifres
+(function(){
+  const h=D.hapi_meta||{};
+  document.getElementById("asof").textContent=`Dades: UCDP ${VER} i Candidate ${PERS} · ACLED fins a la setmana del ${h.acled_to||"–"}`;
+  document.getElementById("phase-note").textContent=`Les xifres del ${Y1} són provisionals (UCDP Candidate) i poden canviar quan l'UCDP publiqui la versió anual. Darrera actualització: ${h.generated||""}.`;
+  const act=CONF.filter(c=>c.status!=="latent");
+  const wars=CONF.filter(c=>c.t===1&&c.int===2).length;
+  const tot26=CONF.reduce((s,c)=>s+d26(c),0)+D.xxx.deaths;
+  document.getElementById("stats").innerHTML=
+   `<div class="stat a"><div class="n">${CONF.length}</div><div class="l">conflictes que compleixen els criteris de l'UCDP (${Y0}–${Y1})</div></div>
+    <div class="stat a"><div class="n">${act.length}</div><div class="l">amb almenys 25 morts el ${Y1} (${PER})</div></div>
+    <div class="stat"><div class="n">${wars}</div><div class="l">guerres el ${Y0} (conflictes estatals amb més de 1.000 morts en combat)</div></div>
+    <div class="stat"><div class="n">${fmt(tot26)}</div><div class="l">morts en violència organitzada, ${PERS} (UCDP, estimació central)</div></div>
+    <div class="stat b"><div class="n">${BSIT.length}</div><div class="l">altres situacions de violència política (categoria B)</div></div>`;
+  const regs=[...new Set(ALL.map(c=>c.reg))].filter(Boolean).sort((a,b)=>a.localeCompare(b,"ca"));
+  const sel=document.getElementById("region");
+  regs.forEach(r=>sel.insertAdjacentHTML("beforeend",`<option value="${esc(r)}">${esc(r)}</option>`));
+})();
+
+// ---------- mapa
+const svg=d3.select("#map"), W=960,H=490;
+const proj=d3.geoNaturalEarth1().fitExtent([[6,6],[W-6,H-6]],{type:"Sphere"});
+const path=d3.geoPath(proj);
+const gZ=svg.append("g");
+gZ.append("path").attr("class","sphere").attr("d",path({type:"Sphere"}));
+gZ.append("path").attr("class","grat").attr("d",path(d3.geoGraticule10()));
+const gC=gZ.append("g"), gH=gZ.append("g"), gM=gZ.append("g");
+let K=1; const ks=()=>Math.pow(K,0.8);
+const feats=topojson.feature(WORLD,WORLD.objects.countries).features.filter(f=>f.id!=="010");
+const cPaths=gC.selectAll("path").data(feats).join("path").attr("d",path).attr("class","country");
+const rH=d3.scaleSqrt().domain([0,3000]).range([1.2,16]).clamp(true);
+const hots=gH.selectAll("circle").data((D.hot||[]).filter(h=>h[2]>0).sort((a,b)=>b[2]-a[2])).join("circle").attr("class","hot")
+  .attr("cx",h=>proj([h[0],h[1]])[0]).attr("cy",h=>proj([h[0],h[1]])[1]).attr("r",h=>rH(h[2]));
+hots.append("title");
+document.getElementById("hotsw").addEventListener("change",e=>gH.attr("display",e.target.checked?null:"none"));
+const rS=d3.scaleSqrt().domain([0,65000]).range([2.6,26]).clamp(true);
+const radius=c=>c.cat==="B"?Math.max(3.5,rS(c.fat12)*0.9):rS(c.status==="latent"?d25(c):d26(c));
+const tip=document.getElementById("tip");
+const sym=d3.symbol().type(d3.symbolDiamond);
+const drawOrder=[...ALL].sort((x,y)=>radius(y)-radius(x));
+const mk=gM.selectAll(".mk").data(drawOrder,d=>d.key).join(enter=>{
+  const g=enter.append(d=>document.createElementNS("http://www.w3.org/2000/svg",d.cat==="B"?"path":"circle"));
+  return g;})
+  .attr("class",d=>"mk "+(d.cat==="B"?"b":"a "+d.status))
+  .each(function(d){const [x,y]=proj(d.ll);const el=d3.select(this);
+     d.xy=[x,y]; if(d.cat==="B"){const r=radius(d);el.attr("d",sym.size(r*r*2.2)()).attr("transform",`translate(${x},${y})`);} else el.attr("cx",x).attr("cy",y).attr("r",radius(d));})
+  .attr("tabindex",0).attr("role","button").attr("aria-label",d=>d.title)
+  .on("click",(e,d)=>select(d.key,true))
+  .on("keydown",(e,d)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(d.key,true)}})
+  .on("mousemove",(e,d)=>{tip.innerHTML=esc(d.title)+"<br>"+(d.cat==="B"?num(d.fat12)+" morts (ACLED, 52 setmanes)":num(d.status==="latent"?d25(d):d26(d))+(d.status==="latent"?` morts el ${Y0}`:` morts ${PERS}`));tip.style.left=Math.min(e.clientX+12,innerWidth-270)+"px";tip.style.top=(e.clientY+12)+"px";tip.style.opacity=1})
+  .on("mouseleave",()=>tip.style.opacity=0);
+
+
+// ---------- zoom
+function rescale(){
+  const f=ks();
+  mk.each(function(d){const el=d3.select(this); if(d.cat==="B") el.attr("transform",`translate(${d.xy[0]},${d.xy[1]}) scale(${1/f})`); else el.attr("r",radius(d)/f);});
+  hots.attr("r",h=>rH(h[2])/f);
+}
+const zoom=d3.zoom().scaleExtent([1,14]).translateExtent([[0,0],[W,H]])
+  .filter(e=>e.type==="wheel"?!(K<=1.001&&e.deltaY>0):(!e.ctrlKey&&!e.button))
+  .on("zoom",e=>{gZ.attr("transform",e.transform); if(Math.abs(e.transform.k-K)>1e-3){K=e.transform.k; rescale();}});
+svg.call(zoom);
+const ZONES={world:null,africa:[[-20,-36],[53,38]],sahel:[[-12,8],[25,22]],grans:[[22,-6],[52,16]],mideast:[[29,12],[64,40]],europe:[[-12,35],[50,63]],asia:[[60,-11],[128,40]],america:[[-118,-35],[-56,33]]};
+function zoomTo(key){
+  const b=ZONES[key]; let t=d3.zoomIdentity;
+  if(b){ const p0=proj([b[0][0],b[1][1]]), p1=proj([b[1][0],b[0][1]]);
+    const dx=p1[0]-p0[0], dy=p1[1]-p0[1], k=Math.min(14,0.92/Math.max(dx/W,dy/H));
+    t=d3.zoomIdentity.translate(W/2,H/2).scale(k).translate(-(p0[0]+p1[0])/2,-(p0[1]+p1[1])/2); }
+  svg.transition().duration(reduce?0:650).call(zoom.transform,t);
+  document.querySelectorAll("#zones button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.z===key));
+}
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.getElementById("zones").addEventListener("click",e=>{const b=e.target.closest("button"); if(b) zoomTo(b.dataset.z);});
+document.getElementById("zin").addEventListener("click",()=>svg.transition().duration(reduce?0:300).call(zoom.scaleBy,1.8));
+document.getElementById("zout").addEventListener("click",()=>svg.transition().duration(reduce?0:300).call(zoom.scaleBy,1/1.8));
+document.getElementById("zreset").addEventListener("click",()=>zoomTo("world"));
+function focusOn(d){
+  const k=Math.max(K,4); const t=d3.zoomIdentity.translate(W/2,H/2).scale(k).translate(-d.xy[0],-d.xy[1]);
+  svg.transition().duration(reduce?0:650).call(zoom.transform,t);
+  document.querySelectorAll("#zones button").forEach(x=>x.setAttribute("aria-pressed","false"));
+}
+
+function visible(c){
+  if(F.cat!=="all"&&c.cat!==F.cat) return false;
+  if(F.type!=="all"&&(c.cat==="B"||String(c.t)!==F.type)) return false;
+  if(F.st==="act"&&c.status==="latent") return false;
+  if(F.region&&c.reg!==F.region) return false;
+  if(F.q){const s=(c.title+" "+(c.cc||[]).join(" ")+" "+(c.a||[]).join(" ")+" "+(c.b||[]).join(" ")+" "+(c.ucdp||"")+" "+(c.name||"")).toLowerCase(); if(!s.includes(F.q)) return false;}
+  return true;
+}
+function refresh(){
+  const vis=ALL.filter(visible);
+  mk.attr("display",d=>visible(d)?null:"none").classed("sel",d=>d.key===selKey);
+  const isoA=new Set(), isoB=new Set();
+  vis.forEach(c=>{ if(c.cat==="A") (c.iso||[]).forEach(i=>isoA.add(i)); else isoB.add(c.isoN); });
+  cPaths.attr("class",f=>"country"+(isoA.has(f.id)?" ca":isoB.has(f.id)?" cb":""));
+  const val=c=>sortK==="title"?c.title:sortK==="fy"?(+(c.start||"").slice(0,4)||c.fy||9999):sortK==="dp"?(c.cat==="B"?-1:d25(c)):sortK==="ev"?(c.ev||0):(c.cat==="B"?c.fat12:d26(c));
+  vis.sort((x,y)=>{const a=val(x),b=val(y);return (typeof a==="string"?a.localeCompare(b,"ca"):a-b)*sortDir;});
+  document.getElementById("count").textContent=vis.length+" elements visibles";
+  document.getElementById("tbody").innerHTML=vis.map(c=>c.cat==="A"?`<tr class="row${c.key===selKey?" sel":""}" tabindex="0" data-k="${c.key}">
+    <td><span class="dot a ${c.status}"></span>${esc(c.title)}<span class="tsub">${esc((c.cc||[]).slice(0,3).join(", "))}</span></td>
+    <td>${TYPESHORT[c.t]}</td><td>${esc(c.reg)}</td><td>${(c.start||"").slice(0,4)||c.fy||"–"}</td>
+    <td class="num">${num(c.dp&&c.dp[1])}</td><td class="num">${c.dc?num(c.dc[1]):"–"}</td><td class="num">${num(c.ev)}</td></tr>`
+   :`<tr class="row${c.key===selKey?" sel":""}" tabindex="0" data-k="${c.key}">
+    <td><span class="dot b"></span>${esc(c.title)}<span class="tsub">ACLED · ${num(c.fat12)} morts en 52 setmanes</span></td>
+    <td>Categoria B</td><td>${esc(c.reg)}</td><td>–</td><td class="num">–</td><td class="num">–</td><td class="num">${num(c.ev12)}</td></tr>`).join("");
+}
+const tb=document.getElementById("tbody");
+tb.addEventListener("click",e=>{const tr=e.target.closest("tr");if(tr)select(tr.dataset.k,false)});
+tb.addEventListener("keydown",e=>{const tr=e.target.closest("tr");if(tr&&(e.key==="Enter"||e.key===" ")){e.preventDefault();select(tr.dataset.k,false)}});
+function seg(id,key){document.getElementById(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;F[key]=b.dataset.v;document.querySelectorAll("#"+id+" button").forEach(x=>x.setAttribute("aria-pressed",x===b));refresh();});}
+seg("seg-cat","cat");seg("seg-type","type");seg("seg-st","st");
+document.getElementById("region").addEventListener("change",e=>{F.region=e.target.value;refresh()});
+document.getElementById("q").addEventListener("input",e=>{F.q=e.target.value.trim().toLowerCase();refresh()});
+document.querySelectorAll("th button").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.k; if(sortK===k) sortDir*=-1; else {sortK=k;sortDir=k==="title"||k==="fy"?1:-1;}
+  document.querySelectorAll("th button").forEach(x=>x.textContent=x.textContent.replace(/ [▾▴]$/,"")); b.textContent+=sortDir<0?" ▾":" ▴"; refresh();}));
+
+// ---------- gràfics
+function bars(vals,labels,hl,aria,color){
+  const w=300,h=60,p=2,max=Math.max(1,...vals.map(v=>v||0));const bw=(w-p*2)/vals.length;
+  return `<svg class="chart" viewBox="0 0 ${w} ${h+24}" width="100%" role="img" aria-label="${esc(aria)}">
+   <line x1="${p}" x2="${w-p}" y1="${h}" y2="${h}" stroke="var(--line)"/>
+   <text x="${w-p}" y="8" text-anchor="end">màx. ${num(max)}</text>
+   ${vals.map((v,i)=>{const bh=((v||0)/max)*(h-12);return `<rect x="${p+i*bw+1.5}" y="${h-bh}" width="${Math.max(1,bw-3)}" height="${bh}" fill="${hl(i)?`var(--${color})`:`var(--${color}-soft)`}"><title>${labels[i]}: ${num(v)}</title></rect>
+   <text x="${p+i*bw+bw/2}" y="${h+11}" text-anchor="middle">${labels[i]}</text>`}).join("")}</svg>`;
+}
+function hapiBlock(isoN,noAcled){
+  const c=CTX[isoN]; if(!c) return "";
+  const rows=[];
+  if(c.idp) rows.push(`<div class="fig"><div class="v">${fmt(c.idp.p)}</div><div class="s">desplaçats interns a ${esc(c.name)} (${esc(c.idp.d.slice(0,7))}; HDX, operació «${esc(c.idp.o||"")}»)</div></div>`);
+  if(c.ref) rows.push(`<div class="fig"><div class="v">${fmt(c.ref.n)}</div><div class="s">refugiats i sol·licitants d'asil originaris de ${esc(c.name)} (ACNUR, ${esc(c.ref.y)})</div></div>`);
+  if(c.acled&&!noAcled) rows.push(`<div class="fig"><div class="v">${num(c.acled.fat52)}</div><div class="s">morts per violència política a ${esc(c.name)} en 52 setmanes (ACLED)</div></div>`);
+  return rows.length?`<div class="sec"><h3>Context humanitari del país</h3><div class="figs">${rows.join("")}</div></div>`:"";
+}
+const chips=list=>`<div class="srcs">${list.map(([t,u])=>`<a class="chip" href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join("")}</div>`;
+
+function edBlock(c){
+  return c.ed?`<div class="sec"><h3>Orígens i context</h3><div class="ed">${c.ed.html}</div>${c.ed.revisat?`<div class="level">Revisat el ${esc(c.ed.revisat)}</div>`:""}</div>`
+   :`<div class="sec"><h3>Orígens i context</h3><div class="pending">Text editorial pendent de redacció.</div></div>`;
+}
+function cardA(c){
+  const sides=c.t===3?`<div class="sides"><div class="side"><b>Perpetrador</b><ul><li>${esc(c.a[0])}</li></ul>${c.gov?'<div class="sup">Actor governamental</div>':''}</div><div class="side"><b>Víctimes</b><ul><li>Població civil</li></ul></div></div>`
+   :`<div class="sides"><div class="side"><b>Bàndol A</b><ul>${c.a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>${c.a2.length?`<div class="sup">Amb suport de: ${esc(c.a2.join(", "))}</div>`:""}</div>
+     <div class="side"><b>Bàndol B</b><ul>${c.b.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>${c.b2.length?`<div class="sup">Amb suport de: ${esc(c.b2.join(", "))}</div>`:""}</div></div>`;
+  const yrs=[]; for(let y=Y0-9;y<=Y0;y++) yrs.push(y);
+  const hist=yrs.map(y=>c.h?(c.h[y]||0):0);
+  const histChart=c.h?bars([...hist,d26(c)],[...yrs.map(y=>"'"+String(y).slice(2)),"'"+String(Y1).slice(2)+"*"],i=>i===hist.length,`Morts per any segons l'UCDP, ${Y0-9}–${Y1}`,"garnet"):"";
+  const monthly=c.m?bars(c.m,MES.slice(0,c.m.length),i=>i===c.m.length-1,`Morts per mes el ${Y1}`,"garnet"):"";
+  const kv=[["Tipus UCDP",TYPE[c.t]+(c.toc?" · "+c.toc.toLowerCase():"")+(c.org?" · "+c.org:"")]];
+  if(c.inc) kv.push(["Incompatibilitat",c.inc+(c.terr?": "+c.terr:"")]);
+  if(c.t===1&&c.int) kv.push([`Intensitat ${Y0}`,c.int===2?"Guerra (≥1.000 morts en combat)":"Conflicte menor (25–999 morts)"]);
+  if(c.start) kv.push(["Inici",c.start.slice(0,4)+(c.start2&&c.start2.slice(0,4)!==c.start.slice(0,4)?" · episodi actual des de "+c.start2.slice(0,4):"")]);
+  else if(c.fy) kv.push(["Primer any registrat",c.fy]);
+  kv.push(["Països",(c.cc||[]).join(", ")]);
+  if(c.adm&&c.adm.length) kv.push([`Zones principals ${Y1}`,c.adm.join(" · ")]);
+  return `<div><div class="badges"><span class="badge a">Categoria A · Criteris UCDP</span><span class="badge st ${c.status}">${ST[c.status]}</span></div>
+    <h2>${esc(c.title)}</h2><div class="where">Nom UCDP: ${esc(c.ucdp)} · fitxa ${esc(c.key)}</div></div>
+  <dl class="kv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+  <div class="sec"><h3>Participants</h3>${sides}</div>
+  <div class="sec"><h3>Víctimes mortals</h3><div class="figs">
+    <div class="fig"><div class="v">${num(c.dp&&c.dp[1])}</div><div class="s">${Y0} · UCDP ${VER}${c.dp?`<br>rang ${num(c.dp[0])} – ${num(c.dp[2])}`:""}</div></div>
+    <div class="fig"><div class="v">${c.dc?num(c.dc[1]):"–"}</div><div class="s">${PERS} · provisional${c.dc?`<br>rang ${num(c.dc[0])} – ${num(c.dc[2])}`:""}</div></div>
+    ${c.dc?`<div class="fig"><div class="v">${num(c.civ)}</div><div class="s">civils morts el ${Y1} (comptats explícitament)</div></div><div class="fig"><div class="v">${num(c.ev)}</div><div class="s">esdeveniments registrats el ${Y1}</div></div>`:""}
+  </div></div>
+  ${histChart?`<div class="sec"><h3>Evolució anual · *${Y1} fins a ${M.m1_name}</h3>${histChart}</div>`:""}
+  ${monthly?`<div class="sec"><h3>Morts per mes, ${Y1}</h3>${monthly}</div>`:""}
+  ${hapiBlock((c.iso||[])[0])}
+  ${edBlock(c)}
+  <div class="sec"><h3>Fonts</h3>${chips([["Fitxa UCDP",UCDPURL(c)],["UCDP Candidate","https://ucdp.uu.se/downloads/#candidate"],["RULAC","https://rulac.org/browse/conflicts"],["CrisisWatch","https://www.crisisgroup.org/crisiswatch"]])}</div>`;
+}
+function cardB(b){
+  const wk=b.wk||[], W=(D.hapi_meta||{}).weeks||[];
+  const lab=W.map((d,i)=>i%13===4?d.slice(5,7)+"/"+d.slice(2,4):"");
+  return `<div><div class="badges"><span class="badge b">Categoria B · Altres violències</span></div>
+    <h2>${esc(b.title)}</h2><div class="where">Fitxa ${esc(b.key)} · cap conflicte de l'UCDP actiu al país el ${Y0} ni el ${Y1}</div></div>
+  <div class="sec"><h3>Violència política · darreres 52 setmanes (ACLED)</h3><div class="figs">
+    <div class="fig"><div class="v">${num(b.fat12)}</div><div class="s">morts</div></div>
+    <div class="fig"><div class="v">${num(b.ev12)}</div><div class="s">esdeveniments (combats, explosions i violència contra civils)</div></div>
+  </div></div>
+  ${wk.length?`<div class="sec"><h3>Morts per setmana (ACLED)</h3>${bars(wk,lab,i=>i===wk.length-1,"Morts per setmana segons ACLED","petrol")}</div>`:""}
+  ${b.types&&b.types.length?`<div class="sec"><h3>Esdeveniments per tipus · 12 setmanes</h3><ul class="mini">${b.types.map(([k,v])=>`<li><span>${esc(k)}</span><span>${num(v)}</span></li>`).join("")}</ul></div>`:""}
+  ${b.top&&b.top.length?`<div class="sec"><h3>Regions amb més morts · 12 setmanes</h3><ul class="mini">${b.top.map(x=>`<li><span>${esc(x[0])}</span><span>${num(x[1])} morts · ${num(x[2])} esdev.</span></li>`).join("")}</ul></div>`:""}
+  ${b.below&&b.below.length?`<div class="sec"><h3>Violència registrada per l'UCDP sota el llindar (${Y1})</h3><ul class="mini">${b.below.map(x=>`<li><span>${esc(x[0])}</span><span>${num(x[1])} morts</span></li>`).join("")}</ul></div>`:""}
+  ${hapiBlock(b.isoN,true)}
+  <div class="why"><b>Per què és categoria B</b>Ni l'UCDP ${VER} (${Y0}) ni l'UCDP Candidate (${PER}) hi registren cap conflicte amb 25 morts o més. La violència que hi documenta ACLED inclou crim organitzat, repressió de protestes i enfrontaments locals que l'UCDP no codifica com a conflicte armat.</div>
+  ${edBlock(b)}
+  <div class="sec"><h3>Fonts</h3>${chips([["ACLED · dades agregades","https://acleddata.com/conflict-data/download-data-files"],["CrisisWatch","https://www.crisisgroup.org/crisiswatch"]])}</div>`;
+}
+function select(key,fromMap,init){
+  const c=ALL.find(x=>x.key===key); if(!c) return;
+  selKey=key; document.getElementById("card").innerHTML=c.cat==="A"?cardA(c):cardB(c); document.getElementById("card").scrollTop=0; refresh();
+  if(window.innerWidth<=960&&fromMap) document.getElementById("card").scrollIntoView({behavior:"smooth",block:"start"});
+  if(!fromMap&&!init&&c.xy) focusOn(c);
+}
+
+// ---------- metodologia
+(function(){
+  const m=D.meta||{}, h=D.hapi_meta||{};
+  document.getElementById("method").innerHTML=`
+  <div><h3>Categoria A · Criteris UCDP</h3><p>Hi entra tot conflicte que l'UCDP registra amb almenys 25 morts en un any: el ${Y0} segons les bases anuals ${VER}, o el ${Y1} (${PER}) segons l'UCDP Candidate. Inclou els tres tipus de l'UCDP: conflictes estatals (amb un govern com a part), conflictes entre grups no estatals i violència unilateral contra civils. Els conflictes actius el ${Y0} que no arriben a 25 morts el ${Y1} es mostren buits al mapa.</p></div>
+  <div><h3>Categoria B · Altres violències</h3><p>Països on ACLED compta almenys ${h.b_threshold||100} morts per violència política en les darreres 52 setmanes i on l'UCDP no hi registra cap conflicte de categoria A. La fitxa recull les dades d'ACLED, la violència que l'UCDP hi registra per sota del llindar i el context humanitari.</p></div>
+  <div><h3>Xifres i límits</h3><ul>
+    <li>Les morts de l'UCDP són l'estimació central, amb el rang baix–alt a la fitxa.</li>
+    <li>Les dades del ${Y1} són provisionals: l'UCDP les revisa en la publicació anual.</li>
+    <li>${num(D.xxx.deaths)} morts del ${Y1} corresponen a esdeveniments sense actor identificat (${D.xxx.n} grups provisionals de l'UCDP) i no s'atribueixen a cap conflicte; compten en el total general.</li>
+    <li>Les xifres de l'UCDP i d'ACLED no se sumen ni es comparen directament: tenen definicions diferents.</li></ul></div>
+  <div><h3>Fonts i versions</h3><ul>
+    <li><a href="https://ucdp.uu.se/downloads/" target="_blank" rel="noopener">UCDP</a>: ${esc(Object.values(m).join(", "))}.</li>
+    <li><a href="https://acleddata.com/conflict-data/download-data-files" target="_blank" rel="noopener">ACLED</a>: fitxers regionals agregats per setmana i regió administrativa, del ${esc(h.acled_from||"")} a la setmana del ${esc(h.acled_to||"")}. Només combats, explosions i violència contra civils. Les zones marítimes no es mostren al mapa.</li>
+    <li><a href="https://data.humdata.org/organization/hdx-hapi" target="_blank" rel="noopener">HDX HAPI (OCHA)</a>: desplaçats interns i refugiats d'ACNUR (${esc(h.ref_year||"–")}).</li>
+    <li>Dades descarregades el ${esc(h.generated||"")}.</li></ul></div>`;
+})();
+
+refresh();
+const firstKey=(()=>{const hk=(location.hash||"").slice(1); if(hk&&ALL.find(x=>x.key===hk)) return hk; return [...CONF].sort((x,y)=>d26(y)-d26(x))[0].key;})();
+select(firstKey,false,true);
+})();
+</script>

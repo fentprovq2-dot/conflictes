@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: atles-conflictes
+    runtime: static
+    branch: main
+    buildCommand: ""
+    staticPublishPath: ./site
+    headers:
+      - path: /data/*
+        name: Cache-Control
+        value: public, max-age=3600
