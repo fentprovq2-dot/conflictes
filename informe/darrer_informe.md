@@ -1,4 +1,4 @@
-# Informe d'actualització · 2026-10-21
+# Informe d'actualització · 2026-10-22
 
 - UCDP: any tancat 2025; Candidate fins a setembre de 2026 (GEDEvent_v26_01_26_09.csv)
 - ACLED: fins a la setmana del 2026-10-10
